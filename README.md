@@ -63,7 +63,8 @@ sudo ./start-mtproxy.sh
 
 ## 4. Создать unit-файл
 
-ВНИМАНИЕ! Выставьте верный путь для вашей системы, замените `/home/username/mtproxy` на свой вариант.
+**ВНИМАНИЕ!**
+**Выставьте верный путь для вашей системы, замените `/home/username/mtproxy` на свой вариант.**
 
 Вариант A (создать вручную):
 
@@ -82,8 +83,8 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=root
-WorkingDirectory=/home/username/mtproxy            # выставьте верный путь
-ExecStart=/home/username/mtproxy/start-mtproxy.sh  # выставьте верный путь
+WorkingDirectory=/home/username/mtproxy
+ExecStart=/home/username/mtproxy/start-mtproxy.sh
 RemainAfterExit=yes
 Restart=no
 ExecStop=/usr/bin/docker stop mtproto-proxy
@@ -110,7 +111,7 @@ sudo systemctl restart mtproxy.service
 
 ```bash
 systemctl status mtproxy.service --no-pager -l
-docker ps | rg mtproto-proxy
+docker ps | grep mtproto-proxy
 journalctl -u mtproxy.service -n 100 --no-pager
 ```
 
