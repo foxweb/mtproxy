@@ -10,29 +10,41 @@ NC='\033[0m'
 CONTAINER_NAME="mtproto-proxy"
 PORT="443"
 FAKE_DOMAIN="ya.ru"  # Домен для Fake TLS
+CONFIG_FILE="$HOME/mtproto_config.txt"
 
 echo "🚀 Запуск MTProto прокси с Fake TLS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo -e "📌 Используем домен: ${BLUE}${FAKE_DOMAIN}${NC}"
 
-# Генерируем секрет для Fake TLS
-echo -n "🔑 Генерация Fake TLS секрета... "
+# Используем существующий секрет из конфига, если есть
+EXISTING_SECRET=""
+if [ -f "${CONFIG_FILE}" ]; then
+    EXISTING_SECRET=$(grep "^SECRET=" "${CONFIG_FILE}" | head -n 1 | cut -d '=' -f2-)
+fi
 
-# Получаем hex домена ya.ru
-DOMAIN_HEX=$(echo -n $FAKE_DOMAIN | xxd -ps | tr -d '\n')
-echo -e "\n   hex домена: ${DOMAIN_HEX}"
+if [ -n "${EXISTING_SECRET}" ]; then
+    SECRET="${EXISTING_SECRET}"
+    echo -e "🔑 Используем существующий секрет из ${CONFIG_FILE}"
+    echo -e "   Секрет: ${YELLOW}${SECRET}${NC}"
+else
+    echo -n "🔑 Генерация Fake TLS секрета... "
 
-# Дополняем случайными символами до 30 символов
-DOMAIN_LEN=${#DOMAIN_HEX}
-NEEDED=$((30 - DOMAIN_LEN))
-RANDOM_HEX=$(openssl rand -hex 15 | cut -c1-$NEEDED)
+    # Получаем hex домена
+    DOMAIN_HEX=$(echo -n "$FAKE_DOMAIN" | xxd -ps | tr -d '\n')
+    echo -e "\n   hex домена: ${DOMAIN_HEX}"
 
-# Собираем секрет
-SECRET="ee${DOMAIN_HEX}${RANDOM_HEX}"
+    # Дополняем случайными символами до 30 символов
+    DOMAIN_LEN=${#DOMAIN_HEX}
+    NEEDED=$((30 - DOMAIN_LEN))
+    RANDOM_HEX=$(openssl rand -hex 15 | cut -c1-"$NEEDED")
 
-echo -e "   Случайное дополнение: ${RANDOM_HEX}"
-echo -e "   Секрет: ${YELLOW}${SECRET}${NC}"
-echo "   Длина: ${#SECRET} символов"
+    # Собираем секрет
+    SECRET="ee${DOMAIN_HEX}${RANDOM_HEX}"
+
+    echo -e "   Случайное дополнение: ${RANDOM_HEX}"
+    echo -e "   Секрет: ${YELLOW}${SECRET}${NC}"
+    echo "   Длина: ${#SECRET} символов"
+fi
 
 # Проверяем, свободен ли порт 443
 echo -n "🔍 Проверка порта ${PORT}... "
