@@ -39,6 +39,28 @@ chmod +x start-mtproxy.sh
 
 Важно: в `start-mtproxy.sh` не должно быть `sudo`.
 
+## Быстрый путь без сервиса (для ленивых)
+
+Если автозапуск не нужен, можно запустить прокси вручную одной командой:
+
+```bash
+cd ~/mtproxy
+sudo ./start-mtproxy.sh
+```
+
+Ссылка `tg://...` будет в выводе скрипта и в файле:
+
+```bash
+grep "^LINK=" ~/mtproto_config.txt
+```
+
+Повторный запуск (пересоздать контейнер и новую ссылку):
+
+```bash
+cd ~/mtproxy
+sudo ./start-mtproxy.sh
+```
+
 ## 4. Создать unit-файл
 
 ВНИМАНИЕ! Выставьте верный путь для вашей системы, замените `/home/username/mtproxy` на свой вариант.
@@ -94,6 +116,30 @@ journalctl -u mtproxy.service -n 100 --no-pager
 
 Для `oneshot` нормальный статус: `Active: active (exited)`.
 Главный признак, что все работает: контейнер `mtproto-proxy` есть в `docker ps`.
+
+## 7. Как получить ссылку на прокси (`tg://...`)
+
+Скрипт печатает ссылку в лог `systemd` при запуске и сохраняет ее в файл.
+
+Из журнала сервиса:
+
+```bash
+journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
+```
+
+Из сохраненного файла:
+
+```bash
+cat ~/mtproto_config.txt
+grep "^LINK=" ~/mtproto_config.txt
+```
+
+Если перезапускали сервис, актуальная ссылка будет из последнего запуска:
+
+```bash
+sudo systemctl restart mtproxy.service
+journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
+```
 
 ## Лицензия
 
