@@ -48,7 +48,7 @@ sudo ./start-mtproxy.sh
 grep -o '^LINK=.*' ./mtproto_config.txt | cut -d= -f2-
 ```
 
-Секрет сохраняется в `./mtproto_config.txt` (в папке проекта) и при следующих запусках переиспользуется.
+Секрет сохраняется в `~/mtproto_config.txt` и при следующих запусках переиспользуется.
 
 Повторный запуск (пересоздать контейнер и новую ссылку):
 
@@ -127,7 +127,7 @@ journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
 Из сохраненного файла:
 
 ```bash
-cat ./mtproto_config.txt
+cat ~/mtproto_config.txt
 grep -o '^LINK=.*' ./mtproto_config.txt | cut -d= -f2-
 ```
 
