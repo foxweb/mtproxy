@@ -10,7 +10,8 @@ NC='\033[0m'
 CONTAINER_NAME="mtproto-proxy"
 PORT="443"
 FAKE_DOMAIN="ya.ru"  # Домен для Fake TLS
-CONFIG_FILE="${MTCONFIG_FILE:-$HOME/mtproto_config.txt}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${MTCONFIG_FILE:-${SCRIPT_DIR}/mtproto_config.txt}"
 
 echo "🚀 Запуск MTProto прокси с Fake TLS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
