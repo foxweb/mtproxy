@@ -22,16 +22,26 @@ sudo systemctl enable --now docker
 docker --version
 ```
 
-## 2. Подготовить проект
+## 2. Клонировать репозиторий
 
 ```bash
-cd /home/foxweb/www/mtproxy
+cd ~
+sudo apt install -y git
+git clone https://github.com/foxweb/mtproxy.git
+cd mtproxy
+```
+
+## 3. Подготовить проект
+
+```bash
 chmod +x start-mtproxy.sh
 ```
 
 Важно: в `start-mtproxy.sh` не должно быть `sudo`.
 
-## 3. Создать unit-файл
+## 4. Создать unit-файл
+
+ВНИМАНИЕ! Выставьте верный путь для вашей системы, замените `/home/username/mtproxy` на свой вариант.
 
 Вариант A (создать вручную):
 
@@ -50,8 +60,8 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=root
-WorkingDirectory=/home/foxweb/www/mtproxy
-ExecStart=/home/foxweb/www/mtproxy/start-mtproxy.sh
+WorkingDirectory=/home/username/mtproxy            # выставьте верный путь
+ExecStart=/home/username/mtproxy/start-mtproxy.sh  # выставьте верный путь
 RemainAfterExit=yes
 Restart=no
 ExecStop=/usr/bin/docker stop mtproto-proxy
@@ -63,10 +73,10 @@ WantedBy=multi-user.target
 Вариант B (скопировать из проекта):
 
 ```bash
-sudo cp /home/foxweb/www/mtproxy/mtproxy.service /etc/systemd/system/mtproxy.service
+sudo cp ~/mtproxy/mtproxy.service /etc/systemd/system/mtproxy.service
 ```
 
-## 4. Включить и запустить сервис
+## 5. Включить и запустить сервис
 
 ```bash
 sudo systemctl daemon-reload
@@ -74,7 +84,7 @@ sudo systemctl enable mtproxy.service
 sudo systemctl restart mtproxy.service
 ```
 
-## 5. Проверка
+## 6. Проверка
 
 ```bash
 systemctl status mtproxy.service --no-pager -l
