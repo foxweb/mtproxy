@@ -1,0 +1,16 @@
+[Unit]
+Description=MTProxy service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/home/foxweb/www/mtproxy
+ExecStart=/home/foxweb/www/mtproxy/start-mtproxy.sh
+RemainAfterExit=yes
+Restart=no
+ExecStop=/usr/bin/docker stop mtproto-proxy
+
+[Install]
+WantedBy=multi-user.target
