@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env -S LC_ALL=C.UTF-8 LANG=C.UTF-8 bash
+# Shebang выше задаёт локаль до старта bash — иначе при несуществующем en_US.UTF-8
+# в окружении появляется: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
 
 set -euo pipefail
 
