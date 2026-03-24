@@ -6,8 +6,8 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=root
-WorkingDirectory=/home/username/mtproxy
-ExecStart=/home/username/mtproxy/start-mtproxy.sh
+WorkingDirectory=@REPO@
+ExecStart=@REPO@/start-mtproxy.sh
 RemainAfterExit=yes
 Restart=no
 ExecStop=/usr/bin/docker stop mtproto-proxy
