@@ -118,24 +118,11 @@ journalctl -u mtproxy.service -n 100 --no-pager
 
 Скрипт печатает ссылку в лог `systemd` при запуске и сохраняет ее в файл.
 
-Из журнала сервиса:
-
-```bash
-journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
-```
-
 Из сохраненного файла:
 
 ```bash
 cat ./mtproto_config.txt
 grep -o '^LINK=.*' ./mtproto_config.txt | cut -d= -f2-
-```
-
-Если перезапускали сервис, актуальная ссылка будет из последнего запуска:
-
-```bash
-sudo systemctl restart mtproxy.service
-journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
 ```
 
 ## Лицензия
