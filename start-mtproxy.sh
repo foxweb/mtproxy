@@ -10,7 +10,8 @@ NC='\033[0m'
 CONTAINER_NAME="mtproto-proxy"
 PORT="443"
 FAKE_DOMAIN="ya.ru"  # Домен для Fake TLS
-CONFIG_FILE="$HOME/mtproto_config.txt"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${MTCONFIG_FILE:-${SCRIPT_DIR}/mtproto_config.txt}"
 
 echo "🚀 Запуск MTProto прокси с Fake TLS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -96,14 +97,14 @@ if docker ps | grep -q ${CONTAINER_NAME}; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
     # Сохраняем конфигурацию
-    cat > ~/mtproto_config.txt << EOF
+    cat > "${CONFIG_FILE}" << EOF
 SERVER=${SERVER_IP}
 PORT=${PORT}
 SECRET=${SECRET}
 DOMAIN=${FAKE_DOMAIN}
 LINK=tg://proxy?server=${SERVER_IP}&port=${PORT}&secret=${SECRET}
 EOF
-    echo "✅ Конфигурация сохранена в ~/mtproto_config.txt"
+    echo "✅ Конфигурация сохранена в ${CONFIG_FILE}"
 
     # Показываем последние логи
     echo ""

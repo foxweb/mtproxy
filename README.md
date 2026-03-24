@@ -45,10 +45,10 @@ sudo ./start-mtproxy.sh
 Ссылка `tg://...` будет в выводе скрипта и в файле:
 
 ```bash
-grep "^LINK=" ~/mtproto_config.txt
+grep "^LINK=" ./mtproto_config.txt
 ```
 
-Секрет сохраняется в `~/mtproto_config.txt` и при следующих запусках переиспользуется.
+Секрет сохраняется в `./mtproto_config.txt` (в папке проекта) и при следующих запусках переиспользуется.
 
 Повторный запуск (пересоздать контейнер и новую ссылку):
 
@@ -127,8 +127,8 @@ journalctl -u mtproxy.service -n 200 --no-pager | grep "tg://proxy?"
 Из сохраненного файла:
 
 ```bash
-cat ~/mtproto_config.txt
-grep "^LINK=" ~/mtproto_config.txt
+cat ./mtproto_config.txt
+grep "^LINK=" ./mtproto_config.txt
 ```
 
 Если перезапускали сервис, актуальная ссылка будет из последнего запуска:
