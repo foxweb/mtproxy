@@ -31,14 +31,11 @@ git clone https://github.com/foxweb/mtproxy.git
 cd mtproxy
 ```
 
-## 3. Подготовить проект
-
-## Быстрый запуск без сервиса (для ленивых)
+## 3. Быстрый запуск без сервиса (для ленивых)
 
 Если автозапуск не нужен, можно запустить прокси вручную одной командой:
 
 ```bash
-cd ~/mtproxy
 sudo ./start-mtproxy.sh
 ```
 
@@ -50,49 +47,42 @@ grep -o '^LINK=.*' ./mtproto_config.txt | cut -d= -f2-
 
 Секрет сохраняется в `./mtproto_config.txt` (в папке проекта) и при следующих запусках переиспользуется.
 
-Повторный запуск (пересоздать контейнер и новую ссылку):
+Повторный запуск:
 
 ```bash
-cd ~/mtproxy
 sudo ./start-mtproxy.sh
 ```
 
-## 4. Создать unit-файл
-
-**ВНИМАНИЕ!**
-**Выставьте верный путь для вашей системы, замените `/home/username/mtproxy` на свой вариант.**
-
-Вариант A (создать вручную):
+Принудительно сгенерировать новый секрет:
 
 ```bash
-sudo nano /etc/systemd/system/mtproxy.service
+sudo ./start-mtproxy.sh --regen-secret
 ```
 
-Вставьте:
-
-```ini
-[Unit]
-Description=MTProxy service
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=oneshot
-User=root
-WorkingDirectory=/home/username/mtproxy
-ExecStart=/home/username/mtproxy/start-mtproxy.sh
-RemainAfterExit=yes
-Restart=no
-ExecStop=/usr/bin/docker stop mtproto-proxy
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Вариант B (скопировать из проекта):
+Показать только ссылку без перезапуска контейнера:
 
 ```bash
-sudo cp ~/mtproxy/mtproxy.service /etc/systemd/system/mtproxy.service
+./start-mtproxy.sh --show-link
+```
+
+Опционально можно задать переменные окружения:
+
+```bash
+FAKE_DOMAIN=google.com PORT=443 ./start-mtproxy.sh
+```
+
+## 4. Установка в качестве сервиса (демона)
+
+Шаблон `mtproxy.service.in` содержит плейсхолдер `@REPO@`. Скрипт подставляет **абсолютный путь к каталогу репозитория** (где лежит `start-mtproxy.sh`) и записывает готовый unit в `/etc/systemd/system/mtproxy.service`.
+
+```bash
+sudo ./install-mtproxy-service.sh
+```
+
+Вручную (эквивалентно скрипту):
+
+```bash
+sed "s#@REPO@#$(pwd)#g" mtproxy.service.in | sudo tee /etc/systemd/system/mtproxy.service
 ```
 
 ## 5. Включить и запустить сервис
@@ -116,7 +106,13 @@ journalctl -u mtproxy.service -n 100 --no-pager
 
 ## 7. Как получить ссылку на прокси (`tg://...`)
 
-Скрипт печатает ссылку в лог `systemd` при запуске и сохраняет ее в файл.
+Самый простой способ:
+
+```bash
+./start-mtproxy.sh --show-link
+```
+
+Скрипт также сохраняет данные в файл:
 
 Из сохраненного файла:
 
@@ -127,10 +123,23 @@ grep -o '^LINK=.*' ./mtproto_config.txt | cut -d= -f2-
 
 ## Лицензия
 
-MIT. Полный текст и дополнительные дисклеймеры: `LICENSE`.
+MIT. Полный текст и дополнительные дисклеймеры: [LICENSE](LICENSE).
 
 ## Благодарности
 
 За основу проекта взят пост на Хабре: [Настраиваем MTProto прокси с Fake TLS за 5 минут](https://habr.com/ru/articles/1010942/).
 
 Спасибо автору публикации за понятный материал и исходную идею.
+
+## Предупреждение `setlocale: LC_ALL: cannot change locale (en_US.UTF-8)`
+
+Значит в SSH/окружении задана локаль `en_US.UTF-8`, а на сервере она не сгенерирована. Скрипт стартует с `C.UTF-8` через shebang; если предупреждение осталось, исправьте систему:
+
+```bash
+sudo apt update
+sudo apt install -y locales
+sudo sed -i 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
+sudo locale-gen
+```
+
+Или однократно без правки системы: `LC_ALL=C.UTF-8 LANG=C.UTF-8 ./start-mtproxy.sh --show-link`.
